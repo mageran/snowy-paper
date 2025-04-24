@@ -1,5 +1,6 @@
 import { createSlice, Draft, PayloadAction, Slice } from "@reduxjs/toolkit";
 import { camelCaseToLabel, formatAmount } from "../../../lib/utils"; // Import the utility function
+import { ActionFontValues } from "@salt-ds/core";
 
 /**
  * MonetaryEntity represents a generic type that represent entites that have an
@@ -14,6 +15,10 @@ export interface MonetaryEntity<StatusType = string> {
     toJson: () => object;
 }
 
+type SliceType<T extends MonetaryEntity<StatusType>, StatusType> = {
+    entities: T[],
+    tableStatus?: StatusType;
+}
 
 /**
  * A Field represents the meta-data of a field in the monetary-entity object.
@@ -228,8 +233,8 @@ export abstract class MonetaryEntityList<
      * The `modify` reducer updates an existing entity in the container by its ID.
      */
     private createSlice() {
-        const initialState = {
-            entities: this.entities,
+        const initialState: SliceType<T, StatusType> = {
+            entities: this.entities
         }
         return createSlice({
             name: this.sliceName,
@@ -237,10 +242,14 @@ export abstract class MonetaryEntityList<
             reducers: {
                 add: (state, action: PayloadAction<T>) => {
                     state.entities.push(action.payload as Draft<T>);
+                },
+                setTableStatus: (state, action: PayloadAction<StatusType>) => {
+                    const newStatus = action.payload as StatusType;
+                    state.tableStatus = newStatus as Draft<StatusType>;
+                },
+                clearTableStatus: (state) => {
+                    delete state.tableStatus;
                 }
-                //add: (state, action: PayloadAction<T>) => {
-                //    state.entities.push(action.payload as Draft<T>);
-                //},
                 //remove: (state, action: PayloadAction<string>) => {
                     //state.entities.remove(action.payload as Draft<T>);
                 //

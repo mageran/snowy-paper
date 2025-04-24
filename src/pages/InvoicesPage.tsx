@@ -6,6 +6,7 @@ import InvoiceForm from "../components/Invoice/InvoiceForm";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../lib/redux/redux";
 import { createFakeInvoice } from "../lib/demo-utils/invoice-faker";
+import InvoiceStatusCardsContainer from "../components/Invoice/InvoiceStatusCardsContainer";
 
 interface InvoicesPageProps {
     invoices: InvoiceList
@@ -46,6 +47,7 @@ const InvoicesPage = ({ invoices }: InvoicesPageProps) => {
     return (
         <>
             <StackLayout direction="column" align="start">
+                <InvoiceStatusCardsContainer entities={invoices} />
                 <ActionBar />
                 <InvoiceTable entities={invoices} />
             </StackLayout>
