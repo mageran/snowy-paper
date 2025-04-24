@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, Draft, PayloadAction, Slice } from "@reduxjs/toolkit";
 import { camelCaseToLabel, formatAmount } from "../../../lib/utils"; // Import the utility function
 
 /**
@@ -22,7 +22,8 @@ export interface MonetaryEntity<StatusType = string> {
  */
 export interface Field {
     id: string,
-    displayDatatype: 'string' | 'number' | 'date' | 'moneyAmount',
+    displayDatatype: 'string' | 'number' | 'date' | 'moneyAmount' | 'enum',
+    enumValues?: string[],
     header?: string,
     display?: (object: MonetaryEntity) => string
 }
@@ -46,6 +47,7 @@ export abstract class MonetaryEntityList<
      */
     public entities: T[] = [];
     public sliceName: string;
+    public slice: Slice;
 
     /**
      * Initializes the container with an optional list of entities.
@@ -55,6 +57,7 @@ export abstract class MonetaryEntityList<
     constructor(reduxSliceName: string, initialEntities: T[] = []) {
         this.entities = initialEntities;
         this.sliceName = reduxSliceName;
+        this.slice = this.createSlice();
     }
 
     /**
@@ -66,6 +69,7 @@ export abstract class MonetaryEntityList<
     private getPresetFields(): Field[] {
         return [{
             id: 'id',
+            header: this.getIdHeader(),
             displayDatatype: 'string'
         }, {
             id: 'value',
@@ -74,7 +78,8 @@ export abstract class MonetaryEntityList<
             display: (entity: MonetaryEntity) => formatAmount(entity.value, entity.currency)
         }, {
             id: 'status',
-            displayDatatype: 'string',
+            displayDatatype: 'enum',
+            enumValues: this.getStatusTypeValues(),
             header: this.getStatusHeader(),
             display: (entity: MonetaryEntity) => this.getStatusLabel(entity)
         }];
@@ -89,12 +94,22 @@ export abstract class MonetaryEntityList<
     abstract getExtensionFields(): Field[];
 
     /**
+     * In order to create proper value dropdowns, the list of status type values are
+     * expected to be returned here.
+     */
+    abstract getStatusTypeValues(): string[];
+
+    /**
      * Combines the preset fields and extension fields into a single array.
      * 
      * @returns An array of `Field` objects representing all fields.
      */
     getAllFields(): Field[] {
         return [...this.getPresetFields(), ...this.getExtensionFields()];
+    }
+
+    getIdHeader(): string {
+        return 'Id';
     }
 
     /**
@@ -207,19 +222,25 @@ export abstract class MonetaryEntityList<
      * The `remove` reducer removes an entity from the container by its ID.
      * The `modify` reducer updates an existing entity in the container by its ID.
      */
-    createSlice() {
+    private createSlice() {
+        const initialState = {
+            entities: this.entities
+        }
         return createSlice({
             name: this.sliceName,
-            initialState: this,
+            initialState: initialState,
             reducers: {
                 add: (state, action: PayloadAction<T>) => {
-                    state.add(action.payload);
+                    state.entities.push(action.payload as Draft<T>);
                 },
                 remove: (state, action: PayloadAction<string>) => {
-                    state.remove(action.payload);
+                    //state.entities.remove(action.payload as Draft<T>);
                 },
                 modify: (state, action: PayloadAction<{ id: string; changes: Partial<T> }>) => {
-                    state.modify(action.payload.id, action.payload.changes);
+                    const entity = state.entities.find(e => e.id === action.payload.id);
+                    if (entity) {
+                        Object.assign(entity, action.payload.changes)
+                    }
                 },
             },
         });

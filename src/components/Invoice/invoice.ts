@@ -1,7 +1,9 @@
 import { MonetaryEntity, MonetaryEntityList, Field } from "../generic/MonetaryEntity/monetary-entity";
 import { camelCaseToLabel } from "../../lib/utils";
 
-export type InvoiceStatus = 'draft' | 'pendingApproval' | 'awaitingPayment' | 'due' | 'pastDue' | 'paid';
+const InvoiceStatusValues = ['draft', 'pendingApproval', 'awaitingPayment', 'due', 'pastDue', 'paid'];
+
+export type InvoiceStatus = typeof InvoiceStatusValues[number];
 
 export interface Invoice extends MonetaryEntity<InvoiceStatus> {
     customerName: string,
@@ -9,7 +11,7 @@ export interface Invoice extends MonetaryEntity<InvoiceStatus> {
 }
 
 export class InvoiceObject implements Invoice {
-    container: InvoiceList;
+    //public container?: InvoiceList;
     id: string;
     value: number;
     currency?: string | undefined;
@@ -18,7 +20,7 @@ export class InvoiceObject implements Invoice {
     invoiceDate: Date;
     
     constructor(
-        container: InvoiceList,
+        //container: InvoiceList,
         id: string,
         value: number,
         status: InvoiceStatus,
@@ -26,7 +28,7 @@ export class InvoiceObject implements Invoice {
         invoiceDate: Date,
         currency?: string,
     ) {
-            this.container = container;
+            //this.container = container;
             this.id = id;
             this.value = value;
             this.currency = currency;
@@ -35,6 +37,25 @@ export class InvoiceObject implements Invoice {
             this.invoiceDate = invoiceDate;
     }
  
+    static createInvoiceFromRecord(data: Record<string, any>): InvoiceObject {
+        let id = String(data.id);
+        let currency = 'USD';
+        let value = Number(data.value);
+        let status: InvoiceStatus = InvoiceStatusValues[0];
+        const statusValue = String(data.status);
+        if (InvoiceStatusValues.includes(statusValue)) {
+            status = statusValue as InvoiceStatus;
+        }
+        let customerName = String(data.customerName);
+        let invoiceDate = new Date();
+        try {
+            invoiceDate = new Date(String(data.invoiceDate))
+        } catch(err:unknown) {
+
+        }
+        return new InvoiceObject(id, value, status, customerName, invoiceDate, currency)
+    }
+
 }
 
 /**
@@ -66,6 +87,14 @@ export class InvoiceList extends MonetaryEntityList<Invoice, InvoiceStatus> {
                 display: (object: MonetaryEntity) => (object as Invoice).invoiceDate.toLocaleDateString(),
             },
         ];
+    }
+
+    getStatusTypeValues(): string[] {
+        return InvoiceStatusValues;
+    }
+
+    getIdHeader(): string {
+        return 'Invoice Id';
     }
 
     /**

@@ -3,7 +3,7 @@ import { MonetaryEntityList } from '../../components/generic/MonetaryEntity/mone
 
 export const createRootReducer = (entityLists: MonetaryEntityList<any, any>[]) => {
     const reducerObj = entityLists.reduce((acc, entityList) => {
-        const slice = entityList.createSlice();
+        const slice = entityList.slice;
         const sliceName = entityList.sliceName;
         acc[sliceName] = slice.reducer;
         return acc;
