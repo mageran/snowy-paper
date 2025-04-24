@@ -3,7 +3,6 @@ import { InvoiceList, InvoiceObject } from "../components/Invoice/invoice";
 import InvoiceTable from "../components/Invoice/InvoiceTable";
 import withDialog from "../components/utilities/withDialog";
 import InvoiceForm from "../components/Invoice/InvoiceForm";
-import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../lib/redux/redux";
 
@@ -22,7 +21,7 @@ const InvoicesPage = ({ invoices }: InvoicesPageProps) => {
         console.log('creating a new invoice using %o', data);
         const invObj = InvoiceObject.createInvoiceFromRecord(data);
         console.log('invoiceObject: %o', invObj);
-        dispatch(add(invObj))
+        dispatch(add(invObj.toJson()))
     }
 
     const InvoiceDialog = withDialog(InvoiceForm)

@@ -6,37 +6,42 @@ const InvoiceStatusValues = ['draft', 'pendingApproval', 'awaitingPayment', 'due
 export type InvoiceStatus = typeof InvoiceStatusValues[number];
 
 export interface Invoice extends MonetaryEntity<InvoiceStatus> {
-    customerName: string,
-    invoiceDate: Date,
+    customerName: string;
+    invoiceDate: Date;
+    dueDate: Date;
+    notes: string; // Added notes field
 }
 
 export class InvoiceObject implements Invoice {
-    //public container?: InvoiceList;
     id: string;
     value: number;
     currency?: string | undefined;
     status?: InvoiceStatus | undefined;
     customerName: string;
     invoiceDate: Date;
-    
+    dueDate: Date;
+    notes: string; // Added notes field
+
     constructor(
-        //container: InvoiceList,
         id: string,
         value: number,
         status: InvoiceStatus,
         customerName: string,
         invoiceDate: Date,
+        dueDate: Date,
+        notes: string, // Added notes parameter
         currency?: string,
     ) {
-            //this.container = container;
-            this.id = id;
-            this.value = value;
-            this.currency = currency;
-            this.status = status;
-            this.customerName = customerName;
-            this.invoiceDate = invoiceDate;
+        this.id = id;
+        this.value = value;
+        this.currency = currency;
+        this.status = status;
+        this.customerName = customerName;
+        this.invoiceDate = invoiceDate;
+        this.dueDate = dueDate;
+        this.notes = notes; // Initialize notes
     }
- 
+
     static createInvoiceFromRecord(data: Record<string, any>): InvoiceObject {
         let id = String(data.id);
         let currency = 'USD';
@@ -48,14 +53,29 @@ export class InvoiceObject implements Invoice {
         }
         let customerName = String(data.customerName);
         let invoiceDate = new Date();
+        let dueDate = new Date();
+        let notes = String(data.notes || ""); // Default notes to an empty string
         try {
-            invoiceDate = new Date(String(data.invoiceDate))
-        } catch(err:unknown) {
-
+            invoiceDate = new Date(String(data.invoiceDate));
+            dueDate = new Date(String(data.dueDate));
+        } catch (err: unknown) {
+            // Handle invalid date parsing
         }
-        return new InvoiceObject(id, value, status, customerName, invoiceDate, currency)
+        return new InvoiceObject(id, value, status, customerName, invoiceDate, dueDate, notes, currency);
     }
 
+    toJson() {
+        return {
+            id: this.id,
+            currency: this.currency,
+            value: this.value,
+            status: String(this.status),
+            customerName: this.customerName,
+            invoiceDate: this.invoiceDate.toLocaleDateString(),
+            dueDate: this.dueDate.toLocaleDateString(),
+            notes: this.notes, // Include notes in JSON
+        };
+    }
 }
 
 /**
@@ -66,9 +86,10 @@ export class InvoiceObject implements Invoice {
  */
 export class InvoiceList extends MonetaryEntityList<Invoice, InvoiceStatus> {
     entities: Invoice[] = [];
+
     /**
      * Returns the extension fields specific to invoices.
-     * These fields include additional metadata such as the customer name and invoice date.
+     * These fields include additional metadata such as the customer name, invoice date, due date, and notes.
      * 
      * @returns An array of `Field` objects representing the extension fields.
      */
@@ -85,6 +106,18 @@ export class InvoiceList extends MonetaryEntityList<Invoice, InvoiceStatus> {
                 displayDatatype: "date",
                 header: "Invoice Date",
                 display: (object: MonetaryEntity) => (object as Invoice).invoiceDate.toLocaleDateString(),
+            },
+            {
+                id: "dueDate",
+                displayDatatype: "date",
+                header: "Due Date",
+                display: (object: MonetaryEntity) => (object as Invoice).dueDate.toLocaleDateString(),
+            },
+            {
+                id: "notes", // Added notes field
+                displayDatatype: "string",
+                header: "Notes",
+                display: (object: MonetaryEntity) => (object as Invoice).notes,
             },
         ];
     }
@@ -113,6 +146,6 @@ export class InvoiceList extends MonetaryEntityList<Invoice, InvoiceStatus> {
      * @returns The formatted status label.
      */
     getStatusLabel(invoice: Invoice): string {
-        return camelCaseToLabel(invoice.status??'undefined');
+        return camelCaseToLabel(invoice.status ?? 'undefined');
     }
 }

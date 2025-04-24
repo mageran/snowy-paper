@@ -16,7 +16,7 @@ import {
     acceptButtonLabel?: string;
     cancelButtonLabel?: string;
   }
-  
+
   const withDialog = <P extends object>(
     WrappedComponent: ComponentType<P>
   ) => {
@@ -45,18 +45,20 @@ import {
           props.onAccept();
         }
       };
-  
+
+      const propsWithOnClose = { ...props, ...{ onCloseDialog: handleClose }}
+
       return (
         <>
-          <Button data-testid="dialog-button" onClick={handleRequestOpen}>
+          <Button data-testid="dialog-button" appearance="transparent" sentiment="accented" onClick={handleRequestOpen}>
             {props.openButtonLabel}
           </Button>
           <Dialog open={open} onOpenChange={onOpenChange} id={id}>
             {props.title && <DialogHeader header={props.title} />}
-            <DialogContent style={{ maxHeight: 400, overflowY: "auto" }}>
-              <WrappedComponent {...(props as P)} />
+            <DialogContent style={{ maxHeight: 600, overflowY: "auto" }}>
+              <WrappedComponent {...(propsWithOnClose as P) } />
             </DialogContent>
-            <DialogActions>
+            { false && <DialogActions>
                {props.cancelButtonLabel && (
                 <Button
                   sentiment="accented"
@@ -76,7 +78,7 @@ import {
                   Close
                 </Button>
               )}
-            </DialogActions>
+            </DialogActions>}
           </Dialog>
         </>
       );

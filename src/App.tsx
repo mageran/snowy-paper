@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import "./App.css";
 import { InvoiceList } from "./components/Invoice/invoice";
-import { createRootReducer } from "./lib/redux/reducer";
+import { createRootReducer, serializeMiddleware } from "./lib/redux/reducer";
 import InvoicesPage from "./pages/InvoicesPage";
 import { Provider } from "react-redux";
 
@@ -12,7 +12,10 @@ function App() {
 
   // initialize redux:
   const rootReducer = createRootReducer([invoices]);
-  const store = configureStore({ reducer: rootReducer });
+  const store = configureStore({
+    reducer: rootReducer,
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(serializeMiddleware),
+  });
 
   return (
     <Provider store={store}>

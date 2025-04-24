@@ -1,4 +1,4 @@
-import { createSlice, Draft, PayloadAction, Slice } from "@reduxjs/toolkit";
+import { createAction, createSlice, Draft, PayloadAction, Slice } from "@reduxjs/toolkit";
 import { camelCaseToLabel, formatAmount } from "../../../lib/utils"; // Import the utility function
 
 /**
@@ -11,6 +11,7 @@ export interface MonetaryEntity<StatusType = string> {
     value: number;
     currency?: string;
     status?: StatusType;
+    toJson: () => object;
 }
 
 
@@ -212,6 +213,10 @@ export abstract class MonetaryEntityList<
         return camelCaseToLabel(String(entity.status));
     }
 
+    toJson() {
+        return this.entities.map(entity => entity.toJson());
+    }
+
     /**
      * Creates a Redux slice for managing the state of the monetary entities.
      * 
@@ -224,24 +229,30 @@ export abstract class MonetaryEntityList<
      */
     private createSlice() {
         const initialState = {
-            entities: this.entities
+            entities: this.entities,
         }
+        const addAction = createAction(`${this.sliceName}/add`, (entities: typeof this) => ({
+            payload: entities
+        }))
         return createSlice({
             name: this.sliceName,
             initialState: initialState,
             reducers: {
                 add: (state, action: PayloadAction<T>) => {
                     state.entities.push(action.payload as Draft<T>);
-                },
-                remove: (state, action: PayloadAction<string>) => {
+                }
+                //add: (state, action: PayloadAction<T>) => {
+                //    state.entities.push(action.payload as Draft<T>);
+                //},
+                //remove: (state, action: PayloadAction<string>) => {
                     //state.entities.remove(action.payload as Draft<T>);
-                },
-                modify: (state, action: PayloadAction<{ id: string; changes: Partial<T> }>) => {
-                    const entity = state.entities.find(e => e.id === action.payload.id);
-                    if (entity) {
-                        Object.assign(entity, action.payload.changes)
-                    }
-                },
+                //
+                //dify: (state, action: PayloadAction<{ id: string; changes: Partial<T> }>) => {
+                //  const entity = state.entities.find(e => e.id === action.payload.id);
+                //  if (entity) {
+                //      Object.assign(entity, action.payload.changes)
+                //  }
+                //
             },
         });
     }
