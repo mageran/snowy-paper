@@ -11,8 +11,13 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.7.0",
+    "@salt-ds/core": "^1.44.0",
+    "@salt-ds/icons": "^1.13.2",
+    "@salt-ds/theme": "^1.28.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-redux": "^9.2.0",
+    "redux": "^5.0.1"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.8",

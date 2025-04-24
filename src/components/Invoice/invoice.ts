@@ -1,11 +1,40 @@
-import { MonetaryEntity, MonetaryEntityContainer, Field } from "../generic/MonetaryEntity/monetary-entity";
+import { MonetaryEntity, MonetaryEntityList, Field } from "../generic/MonetaryEntity/monetary-entity";
 import { camelCaseToLabel } from "../../lib/utils";
 
-type InvoiceStatus = 'draft' | 'pendingApproval' | 'awaitingPayment' | 'due' | 'pastDue' | 'paid';
+export type InvoiceStatus = 'draft' | 'pendingApproval' | 'awaitingPayment' | 'due' | 'pastDue' | 'paid';
 
-interface Invoice extends MonetaryEntity<InvoiceStatus> {
+export interface Invoice extends MonetaryEntity<InvoiceStatus> {
     customerName: string,
     invoiceDate: Date,
+}
+
+export class InvoiceObject implements Invoice {
+    container: InvoiceList;
+    id: string;
+    value: number;
+    currency?: string | undefined;
+    status?: InvoiceStatus | undefined;
+    customerName: string;
+    invoiceDate: Date;
+    
+    constructor(
+        container: InvoiceList,
+        id: string,
+        value: number,
+        status: InvoiceStatus,
+        customerName: string,
+        invoiceDate: Date,
+        currency?: string,
+    ) {
+            this.container = container;
+            this.id = id;
+            this.value = value;
+            this.currency = currency;
+            this.status = status;
+            this.customerName = customerName;
+            this.invoiceDate = invoiceDate;
+    }
+ 
 }
 
 /**
@@ -14,7 +43,8 @@ interface Invoice extends MonetaryEntity<InvoiceStatus> {
  * This class extends the `MonetaryEntityContainer` to provide additional functionality
  * specific to invoices, such as defining extension fields.
  */
-export class InvoiceContainer extends MonetaryEntityContainer<Invoice, InvoiceStatus> {
+export class InvoiceList extends MonetaryEntityList<Invoice, InvoiceStatus> {
+    entities: Invoice[] = [];
     /**
      * Returns the extension fields specific to invoices.
      * These fields include additional metadata such as the customer name and invoice date.
@@ -54,6 +84,6 @@ export class InvoiceContainer extends MonetaryEntityContainer<Invoice, InvoiceSt
      * @returns The formatted status label.
      */
     getStatusLabel(invoice: Invoice): string {
-        return camelCaseToLabel(invoice.status);
+        return camelCaseToLabel(invoice.status??'undefined');
     }
 }

@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { camelCaseToLabel, formatAmount } from "../../../lib/utils"; // Import the utility function
 
 /**
- * MonetaryEntity represents a generic type that represent enties that have an
+ * MonetaryEntity represents a generic type that represent entites that have an
  * id, a status, and a monetary value attached to it.
  * For instance, invoices, payments, etc.
  */
@@ -10,8 +10,9 @@ export interface MonetaryEntity<StatusType = string> {
     id: string;
     value: number;
     currency?: string;
-    status: StatusType;
+    status?: StatusType;
 }
+
 
 /**
  * A Field represents the meta-data of a field in the monetary-entity object.
@@ -36,7 +37,7 @@ export interface Field {
  * @template T - The type of the monetary entities managed by the container.
  * @template StatusType - The type of the status field in the monetary entities.
  */
-export abstract class MonetaryEntityContainer<
+export abstract class MonetaryEntityList<
     T extends MonetaryEntity<StatusType>,
     StatusType = string
 > {
@@ -44,14 +45,16 @@ export abstract class MonetaryEntityContainer<
      * The list of monetary entities managed by the container.
      */
     public entities: T[] = [];
+    public sliceName: string;
 
     /**
      * Initializes the container with an optional list of entities.
      * 
      * @param initialEntities - The initial list of entities to populate the container.
      */
-    constructor(initialEntities: T[] = []) {
+    constructor(reduxSliceName: string, initialEntities: T[] = []) {
         this.entities = initialEntities;
+        this.sliceName = reduxSliceName;
     }
 
     /**
@@ -204,9 +207,9 @@ export abstract class MonetaryEntityContainer<
      * The `remove` reducer removes an entity from the container by its ID.
      * The `modify` reducer updates an existing entity in the container by its ID.
      */
-    createSlice(sliceName: string) {
+    createSlice() {
         return createSlice({
-            name: sliceName,
+            name: this.sliceName,
             initialState: this,
             reducers: {
                 add: (state, action: PayloadAction<T>) => {
