@@ -1,7 +1,7 @@
 import { MonetaryEntity, MonetaryEntityList, Field } from "../generic/MonetaryEntity/monetary-entity";
-import { camelCaseToLabel } from "../../lib/utils";
+import { camelCaseToLabel, dateDisplay, dateFromString, dateInNDays } from "../../lib/utils";
 
-const InvoiceStatusValues = ['draft', 'pendingApproval', 'awaitingPayment', 'due', 'pastDue', 'paid'];
+export const InvoiceStatusValues = ['draft', 'pendingApproval', 'awaitingPayment', 'due', 'pastDue', 'paid'];
 
 export type InvoiceStatus = typeof InvoiceStatusValues[number];
 
@@ -52,15 +52,11 @@ export class InvoiceObject implements Invoice {
             status = statusValue as InvoiceStatus;
         }
         let customerName = String(data.customerName);
-        let invoiceDate = new Date();
-        let dueDate = new Date();
         let notes = String(data.notes || ""); // Default notes to an empty string
-        try {
-            invoiceDate = new Date(String(data.invoiceDate));
-            dueDate = new Date(String(data.dueDate));
-        } catch (err: unknown) {
-            // Handle invalid date parsing
-        }
+    
+        let invoiceDate = dateFromString(data.invoiceDate);
+        let dueDate = dateFromString(data.dueDate, dateInNDays(60));
+        console.log("dueDate: %o", dueDate);
         return new InvoiceObject(id, value, status, customerName, invoiceDate, dueDate, notes, currency);
     }
 
@@ -105,13 +101,13 @@ export class InvoiceList extends MonetaryEntityList<Invoice, InvoiceStatus> {
                 id: "invoiceDate",
                 displayDatatype: "date",
                 header: "Invoice Date",
-                display: (object: MonetaryEntity) => (object as Invoice).invoiceDate.toLocaleDateString(),
+                display: dateDisplay('invoiceDate'),
             },
             {
                 id: "dueDate",
                 displayDatatype: "date",
                 header: "Due Date",
-                display: (object: MonetaryEntity) => (object as Invoice).dueDate.toLocaleDateString(),
+                display: dateDisplay('dueDate'),
             },
             {
                 id: "notes", // Added notes field

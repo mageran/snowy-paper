@@ -5,6 +5,7 @@ import withDialog from "../components/utilities/withDialog";
 import InvoiceForm from "../components/Invoice/InvoiceForm";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../lib/redux/redux";
+import { createFakeInvoice } from "../lib/demo-utils/invoice-faker";
 
 interface InvoicesPageProps {
     invoices: InvoiceList
@@ -35,6 +36,7 @@ const InvoicesPage = ({ invoices }: InvoicesPageProps) => {
                     title="New Invoice"
                     cancelButtonLabel="Cancel"
                     onSave={createNewInvoice}
+                    createSampleData={createFakeInvoice}
                 />
             </StackLayout>
         );

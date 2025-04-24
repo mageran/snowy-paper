@@ -12,13 +12,15 @@ import {
 
 import { Field, MonetaryEntity, MonetaryEntityList } from "./monetary-entity";
 import { NumberInput } from "@salt-ds/lab";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { createFakeInvoice } from "../../../lib/demo-utils/invoice-faker";
 
 interface MonetaryEntityFormProps<T extends MonetaryEntity<StatusType>, StatusType = string> {
     entities?: MonetaryEntityList<T, StatusType>;
     entity?: T,
     onSave: (data: Record<string, any>) => void
     onCloseDialog?: () => void
+    createSampleData?: () => T
 }
 
 type FieldWithRef = Field & { ref: any | null, value?: any }
@@ -27,10 +29,16 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
     onSave,
     onCloseDialog,
     entities,
-    entity, }: MonetaryEntityFormProps<T, StatusType>) => {
+    entity,
+    createSampleData
+}: MonetaryEntityFormProps<T, StatusType>) => {
+
+    const [data, setData] = useState<T>(entity ?? {} as T)
     const fields = entities?.getAllFields() ?? [];
     const fieldsWithRef: FieldWithRef[] = fields.map(fld => ({ ...fld, ...{ ref: null } }))
-    const data: T = entity ?? {} as T
+    //const data: T = entity ?? {} as T
+
+    const useFaker = true;
 
     const saveHook = () => {
         const valueObj: Record<string, any> = {};
@@ -45,7 +53,7 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
         console.log('valueObj: %o', valueObj);
         onSave(valueObj);
         closeHook();
-     }
+    }
 
     const closeHook = () => {
         if (typeof onCloseDialog === 'function') {
@@ -58,6 +66,7 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
             <StackLayout direction="column" align="start">
                 <FlowLayout style={{ marginBottom: '25px', width: "256px" }}>
                     {fieldsWithRef.map((field: FieldWithRef, index: number) => {
+                        console.log('rendering form fields...');
                         const { displayDatatype, header, enumValues } = field;
                         const ref = useRef(null);
                         field.ref = ref;
@@ -71,9 +80,9 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
                                 {(() => {
                                     switch (displayDatatype) {
                                         case "number":
-                                            return <NumberInput inputRef={ref} defaultValue={0} />;
+                                            return <NumberInput inputRef={ref} value={field.value} />;
                                         case "moneyAmount":
-                                            return <NumberInput inputRef={ref} defaultValue={0} decimalPlaces={2} />;
+                                            return <NumberInput inputRef={ref} value={field.value} decimalPlaces={2} />;
                                         case "enum":
                                             if (Array.isArray(enumValues) && enumValues.length > 0) {
                                                 return (
@@ -81,7 +90,9 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
                                                         const newValue = newSelected[0]
                                                         console.log(`new value for ${field.id}: ${newValue}`);
                                                         field.value = newValue;
-                                                    }}>
+                                                    }}
+                                                    selected={field.value ? [field.value] : []}
+                                                    >
                                                         {enumValues.map((value, index) => {
                                                             return (
                                                                 <Option key={index} value={value} />
@@ -92,15 +103,19 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
                                             } else {
                                                 return <Input inputRef={ref} />
                                             }
+                                        case "date":
+                                            if (field.value instanceof Date) {
+                                                return <Input inputRef={ref} value={field.value.toLocaleDateString()}/>
+                                            }
                                         default:
-                                            return <Input inputRef={ref} />
+                                            return <Input inputRef={ref} value={field.value}/>
                                     }
                                 })()}
                             </FormField>
                         )
                     })}
                 </FlowLayout>
-                <FlexLayout 
+                <FlexLayout
                     direction="row"
                     align="end"
                     justify="end"
@@ -110,6 +125,19 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
                         bottom: '40px',
                         right: '50px'
                     }}>
+                    {useFaker && (
+                        <Button
+                            sentiment="neutral"
+                            appearance="transparent"
+                            onClick={() => {
+                                if (typeof createSampleData === 'function') {
+                                    const fakeData = createSampleData();
+                                    console.log("fake invoice: %o", fakeData);
+                                    setData(fakeData);
+                                }
+                            }}
+                        >Insert Sample Data</Button>
+                    )}
                     <Button sentiment="accented" onClick={saveHook}>Save</Button>
                     <Button sentiment="accented" appearance="bordered" onClick={closeHook}>Cancel</Button>
                 </FlexLayout>

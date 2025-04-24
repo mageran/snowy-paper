@@ -14,7 +14,34 @@ export function camelCaseToLabel(camelCaseString: string): string {
 export function formatAmount(amount: number, currency?: string): string {
     const formatted = new Intl.NumberFormat('en-US', {
         style: 'currency',
-        currency: currency??'USD',
+        currency: currency ?? 'USD',
     }).format(amount);
     return formatted;
+}
+
+export function dateDisplay(fieldName: string) {
+    return (object: Record<string, any>) => {
+        const dateObject = object[fieldName];
+        if (dateObject instanceof Date) {
+            return dateObject.toLocaleDateString();
+        }
+        return dateObject + "";
+    }
+}
+
+export function dateFromString(input: any, defaultDate?: Date): Date {
+    if (input instanceof Date) {
+        return input as Date;
+    }
+    const parsedDate = new Date(input);
+    if (isNaN(parsedDate.getTime())) {
+        return defaultDate ?? new Date();
+    }
+    return parsedDate;
+}
+
+export function dateInNDays(n: number): Date {
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + n);
+    return currentDate;
 }
