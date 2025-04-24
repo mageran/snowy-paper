@@ -13,7 +13,6 @@ import {
 import { Field, MonetaryEntity, MonetaryEntityList } from "./monetary-entity";
 import { NumberInput } from "@salt-ds/lab";
 import { useRef, useState } from "react";
-import { createFakeInvoice } from "../../../lib/demo-utils/invoice-faker";
 
 interface MonetaryEntityFormProps<T extends MonetaryEntity<StatusType>, StatusType = string> {
     entities?: MonetaryEntityList<T, StatusType>;
@@ -107,6 +106,7 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
                                             if (field.value instanceof Date) {
                                                 return <Input inputRef={ref} value={field.value.toLocaleDateString()}/>
                                             }
+                                            return <Input inputRef={ref} value={field.value}/>
                                         default:
                                             return <Input inputRef={ref} value={field.value}/>
                                     }

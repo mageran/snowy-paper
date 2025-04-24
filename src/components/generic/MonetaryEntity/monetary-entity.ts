@@ -1,4 +1,4 @@
-import { createAction, createSlice, Draft, PayloadAction, Slice } from "@reduxjs/toolkit";
+import { createSlice, Draft, PayloadAction, Slice } from "@reduxjs/toolkit";
 import { camelCaseToLabel, formatAmount } from "../../../lib/utils"; // Import the utility function
 
 /**
@@ -231,9 +231,6 @@ export abstract class MonetaryEntityList<
         const initialState = {
             entities: this.entities,
         }
-        const addAction = createAction(`${this.sliceName}/add`, (entities: typeof this) => ({
-            payload: entities
-        }))
         return createSlice({
             name: this.sliceName,
             initialState: initialState,
