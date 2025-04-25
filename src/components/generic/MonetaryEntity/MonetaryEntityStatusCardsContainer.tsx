@@ -12,7 +12,10 @@ const MonetaryEntityStatusCardsContainer = <T extends MonetaryEntity<StatusType>
     const statusTypeValues = entities?.getStatusTypeValues() ?? [];
 
     return (
-        <StackLayout direction="row">
+        <StackLayout
+            direction="row"
+            style={{ width: '100%' }}
+        >
         {statusTypeValues.map((statusValue, index) => {
             return (
                 <MonetaryEntityStatusCard
