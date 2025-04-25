@@ -5,6 +5,7 @@ import { createRootReducer, serializeMiddleware } from "./lib/redux/reducer";
 import InvoicesPage from "./pages/InvoicesPage";
 import { Provider } from "react-redux";
 import { AppSettingsProvider } from "./lib/AppSettingsContext"; // Import AppSettingsProvider
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"; // Import react-router components
 import DemoModeSwitch from "./lib/demo-utils/DemoModeSwitch";
 
 export const InvoicesSliceName = "invoices";
@@ -23,7 +24,12 @@ function App() {
     <Provider store={store}>
       <AppSettingsProvider>
         <DemoModeSwitch/>
-        <InvoicesPage invoices={invoices} />
+        <Router>
+          <Routes>
+            <Route path="/" element={<Navigate to="/invoices" replace />} />
+            <Route path="/invoices" element={<InvoicesPage invoices={invoices} />} />
+          </Routes>
+        </Router>
       </AppSettingsProvider>
     </Provider>
   );

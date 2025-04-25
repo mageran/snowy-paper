@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { MonetaryEntity, MonetaryEntityList } from "./monetary-entity";
 import { AppDispatch, RootState } from "../../../lib/redux/redux";
 import { useCallback, useEffect, useState } from "react";
-import { FlexItem, FlexLayout, InteractableCard, Label, StackLayout } from "@salt-ds/core";
+import { FlexLayout, InteractableCard, StackLayout } from "@salt-ds/core";
 import { camelCaseToLabel, formatAmount } from "../../../lib/utils";
 
 const TOPN_ITEM_IN_CARD = 3;
