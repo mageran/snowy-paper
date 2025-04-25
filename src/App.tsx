@@ -4,6 +4,7 @@ import { InvoiceList } from "./components/Invoice/invoice";
 import { createRootReducer, serializeMiddleware } from "./lib/redux/reducer";
 import InvoicesPage from "./pages/InvoicesPage";
 import { Provider } from "react-redux";
+import { AppSettingsProvider } from "./lib/AppSettingsContext"; // Import AppSettingsProvider
 
 export const InvoicesSliceName = "invoices";
 
@@ -19,7 +20,9 @@ function App() {
 
   return (
     <Provider store={store}>
-      <InvoicesPage invoices={invoices}/>
+      <AppSettingsProvider>
+        <InvoicesPage invoices={invoices} />
+      </AppSettingsProvider>
     </Provider>
   );
 }

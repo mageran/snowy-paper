@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 export const createFakeInvoice = (): InvoiceObject => {
     const id = `INV-${faker.string.numeric(5)}`;
     const currency = 'USD';
-    const value = faker.finance.amount({ min: 20, max: 5000 });
+    const value = faker.finance.amount({ min: 20, max: 9999.99 });
     let status = faker.helpers.arrayElement(InvoiceStatusValues);
     const customerName = faker.company.name();
     const notes = faker.lorem.words({ min: 3, max: 8 });

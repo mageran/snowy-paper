@@ -144,4 +144,8 @@ export class InvoiceList extends MonetaryEntityList<Invoice, InvoiceStatus> {
     getStatusLabel(invoice: Invoice): string {
         return camelCaseToLabel(invoice.status ?? 'undefined');
     }
+
+    getEntityFieldForStatusCard(): string {
+        return 'customerName';
+    }
 }

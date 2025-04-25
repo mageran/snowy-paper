@@ -77,9 +77,8 @@ const MonetaryEntityTable = <T extends MonetaryEntity<StatusType>, StatusType>({
   return (
     <div
       className={`ag-theme-salt-${mode}`}
-      style={{ height: 500, width: "100%" }}
+      style={{ height: '55vh', width: "100%" }}
     >
-      <div>TableStatus: {tableStatus}</div>
       <AgGridReact
         columnDefs={columnDefs}
         rowData={tableData}

@@ -105,6 +105,14 @@ export abstract class MonetaryEntityList<
     abstract getStatusTypeValues(): string[];
 
     /**
+     * 
+     * @returns the field to be shown in the status card for the top-n entries
+     */
+    getEntityFieldForStatusCard() {
+        return 'id';
+    }
+
+    /**
      * Combines the preset fields and extension fields into a single array.
      * 
      * @returns An array of `Field` objects representing all fields.
