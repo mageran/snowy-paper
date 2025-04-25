@@ -22,6 +22,11 @@ const MonetaryEntityStatusCardsContainer = <T extends MonetaryEntity<StatusType>
                 />
             )
         })}
+        <MonetaryEntityStatusCard
+            key={statusTypeValues.length}
+            entities={entities}
+            status={null as StatusType}
+        />
         </StackLayout>
     )
 }

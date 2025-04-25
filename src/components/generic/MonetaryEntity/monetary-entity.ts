@@ -1,6 +1,5 @@
 import { createSlice, Draft, PayloadAction, Slice } from "@reduxjs/toolkit";
 import { camelCaseToLabel, formatAmount } from "../../../lib/utils"; // Import the utility function
-import { ActionFontValues } from "@salt-ds/core";
 
 /**
  * MonetaryEntity represents a generic type that represent entites that have an

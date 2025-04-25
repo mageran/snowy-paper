@@ -51,7 +51,7 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
         })
         console.log('valueObj: %o', valueObj);
         onSave(valueObj);
-        closeHook();
+        //closeHook();
     }
 
     const closeHook = () => {
@@ -139,7 +139,7 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
                         >Insert Sample Data</Button>
                     )}
                     <Button sentiment="accented" onClick={saveHook}>Save</Button>
-                    <Button sentiment="accented" appearance="bordered" onClick={closeHook}>Cancel</Button>
+                    <Button sentiment="accented" appearance="bordered" onClick={closeHook}>Close</Button>
                 </FlexLayout>
             </StackLayout>
         </>
