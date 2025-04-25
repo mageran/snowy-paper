@@ -5,6 +5,7 @@ import { createRootReducer, serializeMiddleware } from "./lib/redux/reducer";
 import InvoicesPage from "./pages/InvoicesPage";
 import { Provider } from "react-redux";
 import { AppSettingsProvider } from "./lib/AppSettingsContext"; // Import AppSettingsProvider
+import DemoModeSwitch from "./lib/demo-utils/DemoModeSwitch";
 
 export const InvoicesSliceName = "invoices";
 
@@ -21,6 +22,7 @@ function App() {
   return (
     <Provider store={store}>
       <AppSettingsProvider>
+        <DemoModeSwitch/>
         <InvoicesPage invoices={invoices} />
       </AppSettingsProvider>
     </Provider>

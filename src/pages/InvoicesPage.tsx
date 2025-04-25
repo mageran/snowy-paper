@@ -1,4 +1,4 @@
-import { StackLayout } from "@salt-ds/core";
+import { Button, StackLayout } from "@salt-ds/core";
 import { InvoiceList, InvoiceObject } from "../components/Invoice/invoice";
 import InvoiceTable from "../components/Invoice/InvoiceTable";
 import withDialog from "../components/utilities/withDialog";
@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../lib/redux/redux";
 import { createFakeInvoice } from "../lib/demo-utils/invoice-faker";
 import InvoiceStatusCardsContainer from "../components/Invoice/InvoiceStatusCardsContainer";
+import { useAppSettings } from "../lib/AppSettingsContext";
 
 interface InvoicesPageProps {
     invoices: InvoiceList
@@ -17,7 +18,7 @@ const InvoicesPage = ({ invoices }: InvoicesPageProps) => {
 
     const dispatch = useDispatch<AppDispatch>();
     const { add } = invoices.slice.actions;
-
+    const { isDemoMode } = useAppSettings();
 
     const createNewInvoice = (data: Record<string, any>) => {
         console.log('creating a new invoice using %o', data);
@@ -30,7 +31,7 @@ const InvoicesPage = ({ invoices }: InvoicesPageProps) => {
 
     const ActionBar = () => {
         return (
-            <StackLayout direction="column">
+            <StackLayout direction="row">
                 <InvoiceDialog
                     entities={invoices}
                     openButtonLabel="Enter New Invoice"
@@ -39,6 +40,19 @@ const InvoicesPage = ({ invoices }: InvoicesPageProps) => {
                     onSave={createNewInvoice}
                     createSampleData={createFakeInvoice}
                 />
+                {isDemoMode && (
+                    <Button
+                        appearance="transparent"
+                        onClick={() => {
+                            const numSamples = 50;
+                            for (let i = 0; i < numSamples; i++) {
+                                setTimeout(() => {
+                                    createNewInvoice(createFakeInvoice());
+                                }, i*100)
+                            }
+                        }}
+                    >Generate Sample Data</Button>
+                )}
             </StackLayout>
         );
     }

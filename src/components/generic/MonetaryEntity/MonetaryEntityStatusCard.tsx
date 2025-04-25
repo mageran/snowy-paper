@@ -44,7 +44,6 @@ const MonetaryEntityStatusCard = <T extends MonetaryEntity<StatusType>, StatusTy
         const entitiesCopy = [...entitiesWithStatus];
         entitiesCopy.sort((e1: T, e2: T) => e1.value > e2.value ? -1 : e1.value < e2.value ? 1 : 0);
         const topEntities = entitiesCopy.slice(0, TOPN_ITEM_IN_CARD);
-        console.log("topEntities: %o", topEntities);
         setTopNEntities(topEntities);
     }, [entitiesWithStatus])
 
@@ -64,7 +63,7 @@ const MonetaryEntityStatusCard = <T extends MonetaryEntity<StatusType>, StatusTy
         >
             <FlexLayout direction="column" gap={0.1}>
                 <StackLayout direction="row" align="start">
-                    <div style={{ fontSize: '18pt', fontWeight: "bold", lineHeight: 1.2 }}>{statusLabel}</div>
+                    <div style={{ fontSize: '18pt', fontWeight: "bold", lineHeight: 1.2, minHeight: '60px' }}>{statusLabel}</div>
                 </StackLayout>
                 <FlexLayout direction="row" align="start"
                     style={{ width: '100%', border: '10px transparent solid' }}

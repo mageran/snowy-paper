@@ -12,7 +12,8 @@ import {
 
 import { Field, MonetaryEntity, MonetaryEntityList } from "./monetary-entity";
 import { NumberInput } from "@salt-ds/lab";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useAppSettings } from "../../../lib/AppSettingsContext";
 
 interface MonetaryEntityFormProps<T extends MonetaryEntity<StatusType>, StatusType = string> {
     entities?: MonetaryEntityList<T, StatusType>;
@@ -37,7 +38,9 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
     const fieldsWithRef: FieldWithRef[] = fields.map(fld => ({ ...fld, ...{ ref: null } }))
     //const data: T = entity ?? {} as T
 
-    const useFaker = true;
+    const { isDemoMode } = useAppSettings();
+
+    const useFaker = isDemoMode;
 
     const saveHook = () => {
         const valueObj: Record<string, any> = {};
@@ -65,7 +68,6 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
             <StackLayout direction="column" align="start">
                 <FlowLayout style={{ marginBottom: '25px', width: "256px" }}>
                     {fieldsWithRef.map((field: FieldWithRef, index: number) => {
-                        console.log('rendering form fields...');
                         const { displayDatatype, header, enumValues } = field;
                         const ref = useRef(null);
                         field.ref = ref;
@@ -73,24 +75,33 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
                         if (val !== null) {
                             field.value = val;
                         }
+                        const [fieldValue, setFieldValue] = useState<any>(field.value);
+                        useEffect(() => {
+                            setFieldValue(field.value);
+                        }, [field.value])
+                        const onInputChange = (event: any) => {
+                            console.log('onChange event; %o', event);
+                            setFieldValue((event.target as any).value);
+                        }
                         return (
                             <FormField key={index}>
                                 <FormFieldLabel>{header}</FormFieldLabel>
                                 {(() => {
                                     switch (displayDatatype) {
                                         case "number":
-                                            return <NumberInput inputRef={ref} value={field.value} />;
+                                            return <NumberInput inputRef={ref} value={fieldValue} onChange={onInputChange}/>;
                                         case "moneyAmount":
-                                            return <NumberInput inputRef={ref} value={field.value} decimalPlaces={2} />;
+                                            return <NumberInput inputRef={ref} value={fieldValue} decimalPlaces={2} onChange={onInputChange}/>;
                                         case "enum":
                                             if (Array.isArray(enumValues) && enumValues.length > 0) {
                                                 return (
                                                     <Dropdown onSelectionChange={(_event, newSelected) => {
                                                         const newValue = newSelected[0]
                                                         console.log(`new value for ${field.id}: ${newValue}`);
+                                                        setFieldValue(newValue);
                                                         field.value = newValue;
                                                     }}
-                                                    selected={field.value ? [field.value] : []}
+                                                    selected={fieldValue ? [fieldValue] : []}
                                                     >
                                                         {enumValues.map((value, index) => {
                                                             return (
@@ -103,12 +114,18 @@ const MonetaryEntityForm = <T extends MonetaryEntity<StatusType>, StatusType>({
                                                 return <Input inputRef={ref} />
                                             }
                                         case "date":
-                                            if (field.value instanceof Date) {
-                                                return <Input inputRef={ref} value={field.value.toLocaleDateString()}/>
+                                            if (fieldValue instanceof Date) {
+                                                return <Input
+                                                    inputRef={ref}
+                                                    value={fieldValue.toLocaleDateString()}
+                                                    onChange={onInputChange}/>
                                             }
-                                            return <Input inputRef={ref} value={field.value}/>
+                                            return <Input inputRef={ref} value={fieldValue} onChange={onInputChange}/>
                                         default:
-                                            return <Input inputRef={ref} value={field.value}/>
+                                            return <Input
+                                                inputRef={ref} value={fieldValue}
+                                                onChange={onInputChange}
+                                                />
                                     }
                                 })()}
                             </FormField>
